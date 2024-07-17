@@ -7,7 +7,7 @@ if (!fs.existsSync(logDirectory)) {
 }
 const fileLogger = path.join(logDirectory, 'log.txt');
 
-const loggerAppend = (request, response, next) => {
+const logger = (request, response, next) => {
   const log1 = `${request.method}\n
                 ${new Date().toString()}\n
                 ${request.url} ${JSON.stringify(request.body)}\n`;
@@ -15,4 +15,4 @@ const loggerAppend = (request, response, next) => {
   next();
 };
 
-module.exports = loggerAppend;
+module.exports = logger;
