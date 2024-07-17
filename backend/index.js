@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const appRouter = require('./routeNotes');
 const Note = require('./note');
-const logger = require('./loggerAppend');
+const logger = require('./logger');
 
 const uri = "mongodb+srv://ronhpersonal:123456789David@cluster0.yyfs3xy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" || env.MONGODBURL; //uri from .env doesnt work
 

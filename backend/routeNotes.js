@@ -1,6 +1,6 @@
 const express = require('express');
 const Note = require('./note');
-const logger = require('./loggerAppend');
+const logger = require('./logger');
 const router = express.Router();
 
 const generateId = async () => {
