@@ -5,7 +5,10 @@ const appRouter = require('./routeNotes');
 const Note = require('./note');
 const logger = require('./logger');
 
-const uri = "mongodb+srv://test_user123:zBKvWonhCKg2rCiX@cluster0.r1sudcq.mongodb.net/presubmission?retryWrites=true&w=majority&appName=Cluster0" || env.MONGODBURL; //uri from .env doesnt work
+require('dotenv').config();
+
+
+const uri =  process.env.MONGODB_CONNECTION_URL; 
 
 const app = express();
 app.use(cors());
@@ -15,10 +18,10 @@ app.use(logger);
 
 mongoose.connect(uri, {})
     .then(() => {
-        console.log('Connected to MongoDB');
+        console.log('Connected to MongoDB Serever');
     })
     .catch(err => {
-        console.log('MongoDB connection error', err);
+        console.error('MongoDB connection error to server', err);
     });
 
 const port = process.env.PORT || 3001;
