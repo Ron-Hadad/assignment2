@@ -1,67 +1,53 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from "react";
-import Post from './components/post';
-import Pagination from './components/pagination';
-import axiosInstance from './axiosInstance';
-import AddNote from './components/AddNote';
+import { useState, useEffect, useCallback } from "react";
+import Post from "./components/post";
+import Pagination from "./components/pagination";
+import axiosInstance from "./axiosInstance";
+import AddNote from "./components/AddNote";
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [numOfPages, setNumOfPages] = useState<number>(1);
-  const [posts, setPosts] = useState<any[]>([]); 
+  const [posts, setPosts] = useState<any[]>([]);
+  const [theme, setTheme] = useState<boolean>(false);
   const postsPerPage = 10;
 
-  useEffect(() => {
-  const fetchNotes = async () => {
+  const fetchPosts = async () => {
+    console.log("Fetching posts for page:", currentPage);
     try {
-      const response = await axiosInstance.get('/notes');
+      const response = await axiosInstance.get(`/notes/page/${currentPage}`);
       const data = response.data;
-      console.log('Fetched notes data:', data);
+      console.log("Fetched posts data:", data);
+      if (data && data.notes) {
+        console.log("Fetching data for page:", data.notes);
+        setNumOfPages(data.totalPages);
+        setPosts(data.notes);
+      } else {
+        console.error("Invalid response structure:", data);
+        setPosts([]);
+      }
     } catch (error) {
-      console.error('Error fetching notes:', error);
+      console.error("Error fetching posts:", error);
     }
   };
 
-  fetchNotes();
-}, []);
-
   useEffect(() => {
-    const fetchPosts = async () => {
-      console.log('Fetching posts for page:', currentPage);
-      try {
-        const response = await axiosInstance.get(`/notes/page/${currentPage}`); 
-        const data = response.data;
-        console.log('Fetched posts data:', data); 
-        if (data && data.notes) {
-          console.log('Fetching data for page:', data.notes)
-          setNumOfPages(data.totalPages);
-          setPosts(data.notes); 
-        } else {
-          console.error('Invalid response structure:', data);
-          setPosts([]);
-        }
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-      }
-    };
-    
-
     fetchPosts();
   }, [currentPage, postsPerPage]);
 
   const handleNavButtonClick = (type: string) => {
     switch (type) {
-      case 'First':
+      case "First":
         setCurrentPage(1);
         break;
-      case 'Last':
+      case "Last":
         setCurrentPage(numOfPages);
         break;
-      case 'Next':
+      case "Next":
         setCurrentPage((prevPage) => Math.min(prevPage + 1, numOfPages));
         break;
-      case 'Prev':
+      case "Prev":
         setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
         break;
       default:
@@ -76,27 +62,46 @@ export default function Home() {
   const handleAddNote = async (note: any) => {
     try {
       const response = await axiosInstance.post(`/notes`, note);
-      console.log('Note added successfully:', response.data);
-      setCurrentPage(1); 
+      console.log("Note added successfully:", response.data);
+      setCurrentPage(1);
     } catch (error) {
-      console.error('Error adding note:', error);
+      console.error("Error adding note:", error);
     }
   };
 
+  const reRenderNotes = async () => {
+    fetchPosts();
+  };
+
   return (
-    <main>
+    <main className={theme === false ? "light-theme" : "dark-theme"}>
+      <button
+        className="change_theme"
+        onClick={() => {
+          setTheme((prevTheme: boolean) =>
+            prevTheme === false ? true : false
+          );
+        }}
+      >
+        Switch to {theme === false ? "dark" : "light"} theme
+      </button>
       <div>
-        <Pagination 
-          numOfPages={numOfPages} 
-          currentPage={currentPage} 
-          handleNavButtonClick={handleNavButtonClick} 
+        <Pagination
+          numOfPages={numOfPages}
+          currentPage={currentPage}
+          handleNavButtonClick={handleNavButtonClick}
           handlePaginationButtonClick={handlePaginationButtonClick}
         />
         <div>
           <AddNote handleAddNote={handleAddNote} />
           {posts && posts.length > 0 ? (
             posts.map((post) => (
-              <Post key={post.id} {...post} />
+              <Post
+                key={post.id}
+                {...post}
+                className="note"
+                reRenderNotes={reRenderNotes}
+              />
             ))
           ) : (
             <p>No posts available</p>

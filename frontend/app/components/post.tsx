@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import axiosInstance from '../axiosInstance';
+import React, { useState } from "react";
+import axiosInstance from "../axiosInstance";
+import "./../css/theme.css";
 
 type Author = {
   name: string;
+  email: string;
 };
 
 interface PostProps {
@@ -10,9 +12,16 @@ interface PostProps {
   title: string;
   author: Author;
   content: string;
+  reRenderNotes: Function;
 }
 
-const Post: React.FC<PostProps> = ({ id, title, author, content }) => {
+const Post: React.FC<PostProps> = ({
+  id,
+  title,
+  author,
+  content,
+  reRenderNotes,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedNote, setEditedNote] = useState({
     title,
@@ -20,10 +29,12 @@ const Post: React.FC<PostProps> = ({ id, title, author, content }) => {
     content,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    if (name.startsWith('author.')) {
-      const authorKey = name.split('.')[1] as keyof Author;
+    if (name.startsWith("author.")) {
+      const authorKey = name.split(".")[1] as keyof Author;
       setEditedNote((prevNote) => ({
         ...prevNote,
         author: {
@@ -40,23 +51,27 @@ const Post: React.FC<PostProps> = ({ id, title, author, content }) => {
   };
 
   const handleEdit = () => {
-    axiosInstance.put(`/notes/${id}`, editedNote)
-      .then(response => {
+    axiosInstance
+      .put(`/notes/${id}`, editedNote)
+      .then((response) => {
         console.log(`Updated post with id: ${id}`);
         setIsEditing(false);
+        reRenderNotes();
       })
-      .catch(error => {
-        console.error('Error updating post:', error);
+      .catch((error) => {
+        console.error("Error updating post:", error);
       });
   };
 
   const handleDelete = (id: number) => {
-    axiosInstance.delete(`/notes/${id}`)
-      .then(response => {
+    axiosInstance
+      .delete(`/notes/${id}`)
+      .then((response) => {
         console.log(`Deleted post with id: ${id}`);
+        reRenderNotes();
       })
-      .catch(error => {
-        console.error('Error deleting post:', error);
+      .catch((error) => {
+        console.error("Error deleting post:", error);
       });
   };
 
@@ -82,21 +97,33 @@ const Post: React.FC<PostProps> = ({ id, title, author, content }) => {
           />
           <textarea
             name="content"
+            className={`text_input-${id}`}
             value={editedNote.content}
             onChange={handleChange}
             placeholder="Content"
             required
           ></textarea>
-          <button onClick={handleEdit}>Save</button>
-          <button onClick={() => setIsEditing(false)}>Cancel</button>
+          <button className={`text_input_save-${id}`} onClick={handleEdit}>
+            Save
+          </button>
+          <button
+            className={`text_input_cancel-${id}`}
+            onClick={() => setIsEditing(false)}
+          >
+            Cancel
+          </button>
         </div>
       ) : (
         <div>
           <h2>{title}</h2>
           <p>By: {author.name}</p>
           <p>{content}</p>
-          <button onClick={() => setIsEditing(true)}>Edit</button>
-          <button onClick={() => handleDelete(id)}>Delete</button>
+          <button className={`edit-${id}`} onClick={() => setIsEditing(true)}>
+            Edit
+          </button>
+          <button className={`delete-${id}`} onClick={() => handleDelete(id)}>
+            Delete
+          </button>
         </div>
       )}
     </div>

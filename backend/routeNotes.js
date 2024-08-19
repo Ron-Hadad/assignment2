@@ -76,18 +76,42 @@ router.get('/api/notes/:id', async (req, res) => {
   }
 });
 
-router.get('/api/notes', async (req, res) => {//problem?
-  try {
-    const notes = await Note.find().exec();
-    const count = generateId;
-    res.json({
-      notes,
-      allNotes: count
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+router.put('/api/notes/:id', async (req, res) => {
+    const id = Number(req.params.id);
+    const updatedNoteData = req.body;
+  
+    try {
+      const updatedNote = await Note.findOneAndUpdate(
+        { id },
+        updatedNoteData,
+        { new: true }
+      );
+  
+      if (updatedNote) {
+        res.json(updatedNote);
+      } else {
+        res.status(404).json({ message: 'Note not found' });
+      }
+    } catch (error) {
+      console.log('Error updating note:', error);
+      res.status(500).json({ message: `Error updating note at id: ${id}` });
+    }
 });
+  
+
+router.get('/api/notes', async (req, res) => {
+    try {
+      const notes = await Note.find().exec();
+      const count = await Note.countDocuments(); // Get the total count of notes
+      res.json({
+        notes,
+        allNotes: count // Return the total number of notes
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+});
+  
 
 router.delete('/api/notes/:id', async (req, res) => {
     let id = Number(req.params.id);

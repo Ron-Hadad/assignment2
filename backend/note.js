@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 
 
 const noteSchema = new mongoose.Schema({
-    id: { type: Number, required: true, unique: true },
-    title: { type: String, required: true },
+    id: { type: Number, required: false, unique: true },
+    title: { type: String, required: false },
     author: {
-        name: { type: String, required: true },
-        email: { type: String, required: true }
+        name: { type: String, required: false },
+        email: { type: String, required: false }
     },
-    content: { type: String }
+    content: { type: String, required: false }
 });
 
 const Note = mongoose.model('Note', noteSchema);
