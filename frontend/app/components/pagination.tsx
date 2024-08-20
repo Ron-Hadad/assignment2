@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface PaginationProps {
   numOfPages: number;
@@ -20,12 +20,19 @@ const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <div>
-      <button onClick={() => handleNavButtonClick('First')}>First</button>
-      <button onClick={() => handleNavButtonClick('Prev')} disabled={currentPage === 1}>
+      <button className="first" onClick={() => handleNavButtonClick("First")}>
+        First
+      </button>
+      <button
+        className="previous"
+        onClick={() => handleNavButtonClick("Prev")}
+        disabled={currentPage === 1}
+      >
         Prev
       </button>
       {pageNumbers.map((page) => (
         <button
+          className={`page-${page}`}
           key={page}
           onClick={() => handlePaginationButtonClick(page)}
           disabled={currentPage === page}
@@ -33,10 +40,16 @@ const Pagination: React.FC<PaginationProps> = ({
           {page}
         </button>
       ))}
-      <button onClick={() => handleNavButtonClick('Next')} disabled={currentPage === numOfPages}>
+      <button
+        className="next"
+        onClick={() => handleNavButtonClick("Next")}
+        disabled={currentPage === numOfPages}
+      >
         Next
       </button>
-      <button onClick={() => handleNavButtonClick('Last')}>Last</button>
+      <button className="last" onClick={() => handleNavButtonClick("Last")}>
+        Last
+      </button>
     </div>
   );
 };
