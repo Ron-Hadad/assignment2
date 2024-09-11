@@ -76,7 +76,7 @@ const Post: React.FC<PostProps> = ({
   };
 
   return (
-    <div>
+    <div className="note">
       {isEditing ? (
         <div>
           <input
